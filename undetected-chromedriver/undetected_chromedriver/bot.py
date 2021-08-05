@@ -4,8 +4,10 @@ from selenium.webdriver.support.ui import Select
 #from selenium import webdriver
 options = uc.ChromeOptions()
 
-fit = False;
-maybeFit = False;
+fit = False
+unsureFit = True
+fitTrack = []
+
 
 def signIn():
     ##profile work
@@ -13,10 +15,7 @@ def signIn():
 
     #profile home
     #options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
-
-
-
-    
+   
 
 #Not used
 def employeeTrack():
@@ -35,40 +34,81 @@ def employeeTrack():
 
 def AnalyseWebsite():
     try:
+        #Finding Revenue : TODO: (Pull revenue from different source)
         driver.find_element_by_id("ro__button_unminimize_container").click()
-        driver.implicitly_wait(2)
+        
         driver.switch_to.frame(driver.find_element_by_id("ro__extension_iframe"))
-        driver.implicitly_wait(2)
         driver.switch_to.frame(driver.find_element_by_id("GrowIframe"))
         revenue = driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-reachout/div/div[2]/zi-reachout-company/div/section/div/zi-reachout-tabs/div[2]/zi-reachout-company-detail-tab/zi-reachout-company-data-tab/div/div/zi-reachout-company-detail/div/div[6]/span").text
-        print(revenue)
+        revenue = revenue[1:4]
+        revCheck = False
+        repCheck = False
+        billion = False
+        million = False
+        if('B' in revenue):
+            billion = True
+        elif('M' in revenue):
+            million = True
+        else:
+            revCheck = False
+        if(billion):
+            revCheck = True
+        if(million):    
+            revenue = revenue[1:4]
+            if(revenue.isspace()):
+                revenue = revenue[1:]
+            if(revenue.isspace()):
+                revenue = revenue[1:]
+            revenue = int(revenue)
+            if(revenue > 12):
+                revCheck = True
+                print("Has enough Revenue")
+            else:
+                revCheck = False
+                print("Not enough Revenue")
+        #Finding Sales Reps
         driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-reachout/div/div[2]/zi-reachout-company/div/section/div/div/zi-reachout-company-header/div/div[2]/div[1]").click()
         driver.find_element_by_xpath("//*[@id='Org-Chart-']/div").click()
         try:
             driver.find_element_by_xpath("//*[@id='departments-dropdown']/i").click()
             driver.find_element_by_xpath("//*[@id='selected-item-Sales']").click()
-            #Finish... pull sales reps and add logic
+            driver.find_element_by_xpath("//*[@id='false']/label/span[1]").click()
+            reps = driver.find_element_by_xpath("/html/body/app-root/div/div[1]/zi-profile-page/zi-page-template/div/div/zi-page-content/div/zi-company-profile-wrapper/zi-profile-content-v2/div/div[2]/zi-company-org-chart/div/zi-org-charts/div/div[1]/div[1]/zi-select-manager/zi-dropdown/div/span").text
+            reps = reps[:1]
+            reps = int(reps)
+            if(reps > 4):
+                repCheck = True
+                print("Has enough Reps")
+            else:
+                print("Not enough Reps")
 
-            print("Could be a fit!)")
+            if(repCheck and revCheck):
+                unsureFit = True
+                print("Could be a fit!")
+            else:
+                fit = False
+                print("For sure not a fit...")
             
             
         except:
             print("No employee dropdown, likely not a fit")
-            fit = False;
+            fit = False
             
             
     except:
         print("No zoominfo button, not sure if fit")
-        fit = False;
-        
+        fit = False
 
-    driver.implicitly_wait(4)
+    if(fit):
+        fitTrack.append(1)
+    else:
+        fitTrack.append(0)
     
 
 #opens the first 25 domain links - driver must point to homepage
 def Open25Windows():
     xpathOriginal = "/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[3]/a"
-    for x in range(24):
+    for x in range(25):
         currentNum = str(x+1)
         xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[117+1:]
         print(xpathCurrent)
@@ -78,42 +118,33 @@ def Open25Windows():
 #Bot Start
 signIn()
 
-print("test1")
-
 #just some options passing in to skip annoying popups
 options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
 driver = uc.Chrome(options=options)
+driver.implicitly_wait(5)
 
 with driver:
     #open home page
-    driver.get('https://app.hubspot.com/contacts/1734343/objects/0-2/views/5765433/list')
-    driver.implicitly_wait(2)
-
-    print("test2")
+    driver.get('https://app.hubspot.com/contacts/1734343/objects/0-2/views/6117919/list')
           
     home_window = driver.window_handles[0]
     Open25Windows()
-    driver.implicitly_wait(5)
-    
-    print("test3")
-    
-    for x in reversed(range(24)):
-        
-        print("test4")
-        driver.window_handles[x]
-        AnalyseWebsite()
-        driver.close()
+    handles = driver.window_handles
+    size = len(handles)
 
-    print("test5")
+    #iterate thru windows
+    for x in reversed(range(25)):
+        try:
+            driver.switch_to.window(handles[x+1])
+            AnalyseWebsite()
+            print(driver.title)
+        except:
+            print("Unable to open window")
+    
+    print(fitTrack)
 
     driver.switch_to.window(home_window)
-    print(driver.title)
 
-#useful window commands:
-#window_after = driver.window_handles[1]
-#driver.switch_to.window(window_after)
-#window_after_title = driver.title
-                                           
         
     
                                                                 
