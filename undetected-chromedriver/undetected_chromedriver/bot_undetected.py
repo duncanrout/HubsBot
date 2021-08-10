@@ -13,14 +13,14 @@ fitTrack = []
 
 
 def RandomWait():
-    time.sleep(random.random()*4)
+    time.sleep(random.random()*3)
 
 def signIn():
     ##profile work
-    #options.user_data_dir = "C:\\Users\\Duncan.Rout\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Default"
+    options.user_data_dir = "C:\\Users\\Duncan.Rout\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Default"
 
     ##profile home
-    options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
+    #options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
    
 
 #Not used
@@ -41,6 +41,7 @@ def employeeTrack():
 def AnalyseWebsite():
     fit = False
     unsureFit = False
+    employeeDrop = True
     try:
         #Finding Revenue : TODO: (Pull revenue from different source)
         RandomWait()
@@ -72,7 +73,7 @@ def AnalyseWebsite():
                 revenue = revenue[1:]
             revenue = int(revenue)
             #print(revenue)
-        if(revenue > 10 or billion):
+        if(revenue > 12 or billion):
             revCheck = True
             #print("Has enough Revenue")
         else:
@@ -85,15 +86,15 @@ def AnalyseWebsite():
         time.sleep(5)
         try:
             driver.find_element_by_xpath("//*[@id='departments-dropdown']/i").click()
-            time.sleep(3)
+            time.sleep(2)
             driver.find_element_by_xpath("//*[@id='selected-item-Sales']").click()
-            time.sleep(3)
+            time.sleep(2)
             driver.find_element_by_xpath("//*[@id='false']/label/span[1]").click()
-            time.sleep(3)
+            time.sleep(2)
             reps = driver.find_element_by_xpath("/html/body/app-root/div/div[1]/zi-profile-page/zi-page-template/div/div/zi-page-content/div/zi-company-profile-wrapper/zi-profile-content-v2/div/div[2]/zi-company-org-chart/div/zi-org-charts/div/div[1]/div[1]/zi-select-manager/zi-dropdown/div/span").text
-            print(reps)
+            #print(reps)
             reps = reps[:2]
-            print(reps)
+            #print(reps)
             if(not reps.isalpha()):
                 reps = int(reps)
                 if(reps > 3):
@@ -107,7 +108,7 @@ def AnalyseWebsite():
             else:
                 fit = False     
         except:
-            print("No employee dropdown")
+            employeeDrop = False
             fit = False          
     except:
         unsureFit = True
@@ -115,12 +116,15 @@ def AnalyseWebsite():
 
     if(fit):
         fitTrack.append(1)
-        print("Probably a fit!")
+        print("Could be a fit!")
     elif(unsureFit):
         print("No ZI button or something went wrong, not sure if fit")
         fitTrack.append(5)
     else:
-        print("Considered not a fit")
+        if(employeeDrop == False):
+            print("No employee dropdown, not a fit")
+        else:
+            print("Considered not a fit")
         fitTrack.append(0)
 
 #Bot Start
@@ -141,19 +145,26 @@ with driver:
     RandomWait()
 
     xpathOriginal = "/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[3]/a"
-    for x in range(50):
+    for x in range(25):
+        print(x+1)
         currentNum = str(x+1)
         xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[117+1:]
-        driver.find_element_by_xpath(xpathCurrent).click()
-        p = driver.current_window_handle
-        chwd = driver.window_handles
-        for w in chwd:
-            if(w!=p):
-                driver.switch_to.window(w)
-        AnalyseWebsite()
-        driver.close()
-        driver.switch_to.window(home_window)
-           
+        try:
+            driver.find_element_by_xpath(xpathCurrent).click()
+            p = driver.current_window_handle
+            chwd = driver.window_handles
+            for w in chwd:
+                if(w!=p):
+                    driver.switch_to.window(w)
+            AnalyseWebsite()
+        
+            driver.close()
+            driver.switch_to.window(home_window)
+            if(x == 9 or x == 19 or x == 29 or x == 39 or x == 49):
+                fitTrack.append(8)
+        except:
+            print("something went wrong here")
+            print(fitTrack)
     print(fitTrack)
 
 
