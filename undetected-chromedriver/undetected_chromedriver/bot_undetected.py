@@ -8,7 +8,7 @@ import random
 options = uc.ChromeOptions()
 
 fit = False
-unsureFit = True
+unsureFit = False
 fitTrack = []
 
 
@@ -17,10 +17,10 @@ def RandomWait():
 
 def signIn():
     ##profile work
-    options.user_data_dir = "C:\\Users\\Duncan.Rout\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Default"
+    #options.user_data_dir = "C:\\Users\\Duncan.Rout\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Default"
 
-    #profile home
-    #options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
+    ##profile home
+    options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
    
 
 #Not used
@@ -39,6 +39,8 @@ def employeeTrack():
 
 
 def AnalyseWebsite():
+    fit = False
+    unsureFit = False
     try:
         #Finding Revenue : TODO: (Pull revenue from different source)
         RandomWait()
@@ -49,7 +51,7 @@ def AnalyseWebsite():
         driver.switch_to.frame(driver.find_element_by_id("GrowIframe"))
         RandomWait()
         revenue = driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-reachout/div/div[2]/zi-reachout-company/div/section/div/zi-reachout-tabs/div[2]/zi-reachout-company-detail-tab/zi-reachout-company-data-tab/div/div/zi-reachout-company-detail/div/div[6]/span").text
-        print(revenue)
+        #print(revenue)
         revCheck = False
         repCheck = False
         billion = False
@@ -69,13 +71,13 @@ def AnalyseWebsite():
             if(revenue.isspace()):
                 revenue = revenue[1:]
             revenue = int(revenue)
-            print(revenue)
+            #print(revenue)
         if(revenue > 10 or billion):
             revCheck = True
-            print("Has enough Revenue")
+            #print("Has enough Revenue")
         else:
             revCheck = False
-            print("Not enough Revenue")
+            #print("Not enough Revenue")
         #Finding Sales Reps
         driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-reachout/div/div[2]/zi-reachout-company/div/section/div/div/zi-reachout-company-header/div/div[2]/div[1]").click()
         RandomWait()
@@ -94,31 +96,31 @@ def AnalyseWebsite():
             print(reps)
             if(not reps.isalpha()):
                 reps = int(reps)
-                if(reps > 4):
+                if(reps > 3):
                     repCheck = True
-                    print("Has enough Reps")
+                    #print("Has enough Reps")
                 else:
-                    print("Not enough Reps")
-
+                    repCheck = False
+                    #print("Not enough Reps")
             if(repCheck and revCheck):
-                unsureFit = True
                 fit = True
-                print("Could be a fit!")
             else:
-                fit = False
-                print("For sure not a fit...")
+                fit = False     
         except:
-            print("No employee dropdown, likely not a fit")
-            fit = False
-            
-            
+            print("No employee dropdown")
+            fit = False          
     except:
-        print("No zoominfo button, not sure if fit")
+        unsureFit = True
         fit = False
 
     if(fit):
         fitTrack.append(1)
+        print("Probably a fit!")
+    elif(unsureFit):
+        print("No ZI button or something went wrong, not sure if fit")
+        fitTrack.append(5)
     else:
+        print("Considered not a fit")
         fitTrack.append(0)
 
 #Bot Start
@@ -128,7 +130,7 @@ signIn()
 #just some options passing in to skip annoying popups
 options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
 driver = uc.Chrome(options=options)
-driver.implicitly_wait(5)
+driver.implicitly_wait(6)
 
 with driver:
     #open home page
@@ -139,7 +141,7 @@ with driver:
     RandomWait()
 
     xpathOriginal = "/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[3]/a"
-    for x in range(25):
+    for x in range(50):
         currentNum = str(x+1)
         xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[117+1:]
         driver.find_element_by_xpath(xpathCurrent).click()
