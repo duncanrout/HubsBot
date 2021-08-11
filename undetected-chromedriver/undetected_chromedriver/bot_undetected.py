@@ -13,7 +13,7 @@ fitTrack = []
 
 
 def RandomWait():
-    time.sleep(random.random()*3)
+    time.sleep(random.random()*2)
 
 def signIn():
     ##profile work
@@ -27,14 +27,20 @@ def signIn():
 def employeeTrack():
     #Once at Company IFrame
     driver.find_element_by_xpath("//*[@id='Employees-']/div/div").click()
-    driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-profile-page/zi-page-template/div/div/zi-page-content/div/zi-company-search-result-row/zi-search-result-row/zi-profile-content/div/div[2]/zi-row-secondary-content/div/zi-management-role-chip/span/span/span[1]/div/a/span/div[1]/span/span").click()
-    driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-pages/div/div/div/div/zi-search-core-container/zi-page-template/div/div/zi-page-content/div/div/div[1]/zi-filters/div/div/div[2]/div/zi-shared-filters-container/div[1]/div/span").click()
-    driver.find_element_by_xpath("//*[@id='job-titles-filters']/div/span").click()
-    driver.find_element_by_xpath("//*[@id='jobFunctions-Sales']/label/span[1]").click()
-    sales_reps = driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-pages/div/div/div/div/zi-search-core-container/zi-page-template/div/div/zi-page-content/div/div/div[2]/zi-people-results-page/div/div/div[2]/div/div[1]").text
-    #sales_reps = driver.find_element_by_class_name("results-count")
-    #sales_reps = driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-pages/div/div/div/div/zi-search-core-container/zi-page-template/div/div/zi-page-content/div/div/div[2]/zi-people-results-page/div/div/div[2]/div/div/span[1]")
-    #Prints out black, realized it was wrong number anyways
+    try:
+        driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-profile-page/zi-page-template/div/div/zi-page-content/div/zi-company-profile-wrapper/zi-profile-content-v2/div/div[2]/zi-company-employees/zi-row-secondary-content/div/zi-management-role-chip/span/span/span[1]/div/a/span/div[1]").click()
+
+    except:
+        print("try again")
+
+
+    #driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-pages/div/div/div/div/zi-search-core-container-v2/div/div/div[1]/zi-filters-ng/div/div/div[2]/zi-shared-filters-container-ng/div[1]/div[2]/div/span").click()
+    #//*[@id="job-titles-filters"]/div/span
+    #//*[@id="jobFunctions-Sales"]/label/span[1]
+    #//*[@id="people-search"]/span
+        #^.text
+
+
     print(sales_reps)
 
 
@@ -82,15 +88,17 @@ def AnalyseWebsite():
         #Finding Sales Reps
         driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-reachout/div/div[2]/zi-reachout-company/div/section/div/div/zi-reachout-company-header/div/div[2]/div[1]").click()
         RandomWait()
+        #employeeTrack()
+        #time.sleep(20)
         driver.find_element_by_xpath("//*[@id='Org-Chart-']/div").click()
         time.sleep(5)
         try:
             driver.find_element_by_xpath("//*[@id='departments-dropdown']/i").click()
-            time.sleep(2)
+            RandomWait()
             driver.find_element_by_xpath("//*[@id='selected-item-Sales']").click()
-            time.sleep(2)
+            RandomWait()
             driver.find_element_by_xpath("//*[@id='false']/label/span[1]").click()
-            time.sleep(2)
+            RandomWait()
             reps = driver.find_element_by_xpath("/html/body/app-root/div/div[1]/zi-profile-page/zi-page-template/div/div/zi-page-content/div/zi-company-profile-wrapper/zi-profile-content-v2/div/div[2]/zi-company-org-chart/div/zi-org-charts/div/div[1]/div[1]/zi-select-manager/zi-dropdown/div/span").text
             #print(reps)
             reps = reps[:2]
@@ -145,7 +153,7 @@ with driver:
     RandomWait()
 
     xpathOriginal = "/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[3]/a"
-    for x in range(25):
+    for x in range(5):
         print(x+1)
         currentNum = str(x+1)
         xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[117+1:]
@@ -160,15 +168,12 @@ with driver:
         
             driver.close()
             driver.switch_to.window(home_window)
-            if(x == 9 or x == 19 or x == 29 or x == 39 or x == 49):
-                fitTrack.append(8)
         except:
             print("something went wrong here")
             print(fitTrack)
     print(fitTrack)
+    
 
-
-        
     
                                                                 
     
