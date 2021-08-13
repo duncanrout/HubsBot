@@ -12,14 +12,14 @@ unsureFit = False
 fitTrack = []
 
 def RandomWait():
-    time.sleep(1 + random.random()*3)
+    time.sleep(1 + random.random()*2)
 
 def signIn():
     ##profile work
-    options.user_data_dir = "C:\\Users\\Duncan.Rout\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Default"
+    #options.user_data_dir = "C:\\Users\\Duncan.Rout\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Default"
 
     ##profile home
-    #options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
+    options.user_data_dir = "C:\\Users\\dunca\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
    
 
 #Top Contacts Route
@@ -60,8 +60,10 @@ def AnalyseWebsite():
     repCheck = False
     foundReps = False
     reps = 0
+    charCount = 0
     try:
         try:
+            
             RandomWait()
             driver.find_element_by_id("ro__button_unminimize_container").click()
             RandomWait()
@@ -70,29 +72,43 @@ def AnalyseWebsite():
             driver.switch_to.frame(driver.find_element_by_id("GrowIframe"))
             RandomWait()
             revenue = driver.find_element_by_xpath("//*[@id='app-root']/div/div[1]/zi-reachout/div/div[2]/zi-reachout-company/div/section/div/zi-reachout-tabs/div[2]/zi-reachout-company-detail-tab/zi-reachout-company-data-tab/div/div/zi-reachout-company-detail/div/div[6]/span").text
+            print(revenue)
             billion = False
             million = False
             if('B' in revenue):
                 billion = True
-                print("This company has a revanue of billion or more")
+                print("This company has a revenue of billion or more")
             elif('M' in revenue):
                 million = True
             else:
                 revCheck = False
+                revenue = 1
+                revenue = int(revenue)
             if(billion):
                 revCheck = True
             if(million):
-                revenue = revenue[1:3]
+                charCount = 0
+                for char in revenue:
+                    charCount = charCount + 1
+                    print(char)
+                    if(char == "."):
+                        print(revenue)
+                        revenue = revenue[1:charCount-1]
+                print(revenue)
                 if(revenue.isspace()):
                     revenue = revenue[1:]
                 if(revenue.isspace()):
                     revenue = revenue[1:]
+                print(revenue)
                 revenue = int(revenue)
-                print("Company has a revanue of $" + str(revenue) + " million")
-            if(revenue > 12 or billion):
+                print(revenue)
+                
+ 
+            if(revenue > 11 or billion):
                 revCheck = True
             else:
                 revCheck = False
+            print("Company has a revenue of $" + str(revenue) + " million")
         except:
             print("Could not open ZI")
             OpenZI = False
@@ -104,7 +120,7 @@ def AnalyseWebsite():
             RandomWait()
             try:
                 driver.find_element_by_xpath("//*[@id='Org-Chart-']/div").click()
-                time.sleep(5)
+                RandomWait()
                 try:
                     driver.find_element_by_xpath("//*[@id='departments-dropdown']/i").click()
                     RandomWait()
@@ -153,9 +169,32 @@ def AnalyseWebsite():
         print("Considered not a fit")
         fitTrack.append(0)
 
+def DuncanNotAFit():
+        #driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[1]").click()
+        driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/thead/tr/th[2]/div/div/button[5]").click()
+        driver.find_element_by_xpath("/html/body/div[7]/div/div/div/div/div/div").click()
+        search = driver.find_element_by_xpath("/html/body/div[8]/div/div/div/div/div/div/input")
+        search.send_keys("Duncan Not")
+        time.sleep(6)
+        search.send_keys(Keys.ENTER)
+        time.sleep(2)
+        driver.find_element_by_xpath("/html/body/div[7]/div/div/div/div/footer/div/div/button[1]").click()
+        driver.find_element_by_xpath("/html/body/div[7]/div/div/div/div/header/div/div").click()
+        
+def DuncanBotUnsureFit():
+        #driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[1]").click()
+        driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/thead/tr/th[2]/div/div/button[5]").click()
+        driver.find_element_by_xpath("/html/body/div[7]/div/div/div/div/div/div").click()
+        search = driver.find_element_by_xpath("/html/body/div[8]/div/div/div/div/div/div/input")
+        
+        search.send_keys("Duncan Bot")
+        time.sleep(6)
+        search.send_keys(Keys.ENTER)
+        time.sleep(2)
+        driver.find_element_by_xpath("/html/body/div[7]/div/div/div/div/footer/div/div/button[1]").click()
+        driver.find_element_by_xpath("/html/body/div[7]/div/div/div/div/header/div/div").click()
 #Bot Start
 signIn()
-
 
 #just some options passing in to skip annoying popups
 options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
@@ -167,12 +206,14 @@ with driver:
     driver.get('https://app.hubspot.com/contacts/1734343/objects/0-2/views/6117919/list')
     home_window = driver.window_handles[0]
     RandomWait()
-
     xpathOriginal = "/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[3]/a"
+    xpathOriginalButton = "/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/tbody/tr[1]/td[1]"
+
     for x in range(15):
         print("Company: " + str(x+1))
         currentNum = str(x+1)
-        xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[117+1:]
+        xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[118:]
+        xpathCurrentButton = xpathOriginalButton[0:117] + currentNum + xpathOriginalButton[118:]
         try:
             driver.find_element_by_xpath(xpathCurrent).click()
             p = driver.current_window_handle
@@ -183,10 +224,39 @@ with driver:
             AnalyseWebsite()
             driver.close()
             driver.switch_to.window(home_window)
+            #Select if not a fit
+            if(fitTrack[x] == 0):
+                driver.find_element_by_xpath(xpathCurrentButton).click()
         except:
             print("something went wrong here")
         print(fitTrack)
     print(fitTrack)
+    #Puts all the non fits in bucket given they are selected
+    try:
+        DuncanNotAFit()
+    except:
+        print("No companies selected for 'not a fit'")
+    driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/thead/tr/th[1]/div/div/div/div/label/span/span").click()
+    time.sleep(3)
+    driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/thead/tr/th[1]/div/div/div/div/label/span/span").click()
+    try:
+        
+        #Puts all other in unsure bucket
+        for x in range(15):
+            currentNum = str(x+1)
+            xpathCurrent = xpathOriginal[0:117] + currentNum + xpathOriginal[118:]
+            xpathCurrentButton = xpathOriginalButton[0:117] + currentNum + xpathOriginalButton[118:]
+            if(fitTrack[x] != 0):
+                driver.find_element_by_xpath(xpathCurrentButton).click()
+        DuncanBotUnsureFit()
+    except:
+        print("No companies selected for 'unsure of fit'")
+    driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/thead/tr/th[1]/div/div/div/div/label/span/span").click()
+    time.sleep(3)
+    driver.find_element_by_xpath("/html/body/div[2]/div[1]/div/div[2]/div/div/section/div/div/main/div/div[2]/div/div/div[1]/div/div[1]/table/thead/tr/th[1]/div/div/div/div/label/span/span").click()
+    #Wait minute then reset
+       
+    
     
 
     
