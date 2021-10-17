@@ -47,6 +47,7 @@ driver.implicitly_wait(6)
 deleteTrack = []
 emptyCount = 0
 delete = False
+dateDelete = False
 
 with driver:
 
@@ -60,6 +61,7 @@ with driver:
         print(currentNumY)
         emptyCount = 0
         delete = True
+        dateDelete = False
              
         for x in range(9):
             currentNumX = str(x+1)
@@ -72,22 +74,72 @@ with driver:
 
             currentBox = driver.find_element_by_xpath(xpathCurrent).text
             if not currentBox:
-                print(0)
+                #print(0)
                 emptyCount = emptyCount + 1
-            else:
-                print(currentBox)
+            #else:
+                #print(currentBox)
+                
+                
             if(x == 1 and (("Admin" in currentBox) or ("admin" in currentBox) or ("ADMIN" in currentBox) or ("ADMAN" in currentBox) or ("Adman" in currentBox) or ("adman" in currentBox))):
-                print("No Delete... Admin")
+                #print("No Delete... Admin")
                 delete = False
             if((delete == True) and (x == 8) and (("2016" in currentBox) or ("2017" in currentBox) or ("2018" in currentBox) or ("2019" in currentBox))):
-                print("Delete... Date")
+                #print("Delete... Date")
+                delete = True
+                dateDelete = True
 
-    #not triggering...
-    if((delete == True) and (emptyCount == 6)):
-        print("Delete... Empty")
+        if(emptyCount == 6):
+            #print("Delete... Empty")
+            delete = True
+        if(delete == True and dateDelete == True):
+            print("Delete this one!")
+            driver.find_element_by_xpath(xpathCurrent).click()
+            driver.find_element_by_xpath("//*[@id='action-buttons__crm']").click()
+            driver.switch_to.window(driver.window_handles[0])
+            driver.switch_to.frame(driver.find_element_by_xpath("/html/body/div[1]/div/div/iframe"))
+        else:
+            #do not delete
+            print("Skip")
+
+
+    #Start deleting!
+
+    length = len(driver.window_handles)
+    print(length)
     
-
-            #1 if delete
+    for x in reversed(range(length)):
+        driver.switch_to.window(driver.window_handles[x - 1])
+        try:
+            driver.find_element_by_xpath("//*[@id='ctl00_nav_toc']/li[3]").click()
+            try:
+                date = driver.find_element_by_xpath("//*[@id='aspnetForm']/section/div[2]/div[1]/header/div/div[2]").text
+                if(("2016" in date) or ("2017" in date) or ("2018" in date) or ("2019" in date)):
+                    driver.find_element_by_xpath('//*[@id="ctl00_nav_toc"]/li[1]').click()
+                    driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_divProspect"]/input[2]').click()
+                    time.sleep(2)
+                    driver.find_element_by_xpath('/html/body/div[4]/div[7]/div/button').click()
+                    time.sleep(4)
+                    driver.close()
+                    print("Deleted!")
+                else:
+                    print("Skipping this one!")
+            except:
+                driver.find_element_by_xpath('//*[@id="ctl00_nav_toc"]/li[1]').click()
+                driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_divProspect"]/input[2]').click()
+                time.sleep(2)
+                driver.find_element_by_xpath('/html/body/div[4]/div[7]/div/button').click()
+                time.sleep(4)
+                driver.close()
+                print("Deleted!")
+        except:
+            driver.close()
+            
+        
+               
+            
+        
+        
+        
 
 
 
